@@ -6,7 +6,7 @@ let
         inherit (builtins) fetchurl;
         name = "env-vars";
         builder = "${bash}/bin/bash";
-        args = [ "-c" "echo \"\$0"\" "${envFile}" ];
+        args = [ "-c" "echo \"\$0\"" "${envFile}" ];
     };
 
     config_ssid = envVars.CONFIG_NET_SSID;
