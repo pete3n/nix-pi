@@ -61,7 +61,7 @@
 	    kernelPatches = [
 	      ({ 
 	        name = "rpi-zero-2-w-usb-host";
-            patch = ./bcm2837-rpi-zero-2-w-usb-host.patch;
+            patch = ./patches/bcm2837-rpi-zero-2-w-usb-host.patch;
 	      })
 	    ];
 	    
