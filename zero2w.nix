@@ -1,4 +1,18 @@
 { lib, modulesPath, pkgs, ... }: 
+
+let
+    envFile = builtins.readFile ./.env;
+    envVars = builtins.parseDrv {
+        inherit (builtins) fetchurl;
+        name = "env-vars";
+        builder = "${bash}/bin/bash";
+        args = [ "-c" ''echo "$0"'' ${envFile} ];
+    };
+
+    config_ssid = envVars.CONFIG_NET_SSID;
+    config_pass = envVars.CONFIG_NET_PASSWORD;
+in
+
 {
   imports = [
     ./sd-image.nix
@@ -104,8 +118,8 @@
       enable = true;
       interfaces = ["wlan0"];
       networks = {
-        "config-net-ssid" = {
-          psk = "config-net-password";
+        "${config_ssid}" = {
+          psk = "${config_pass}";
         };
       };
     };
