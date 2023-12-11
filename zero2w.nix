@@ -1,17 +1,4 @@
-{ lib, modulesPath, pkgs, ... }: 
-
-let
-    envFile = builtins.readFile ./.env;
-    envVars = builtins.parseDrv {
-        inherit (builtins) fetchurl;
-        name = "env-vars";
-        builder = "${pkgs.bash}/bin/bash";
-        args = [ "-c" "echo \"\$0\"" "${envFile}" ];
-    };
-
-    config_ssid = envVars.CONFIG_NET_SSID;
-    config_pass = envVars.CONFIG_NET_PASSWORD;
-in
+{ config, lib, modulesPath, pkgs, ... }: 
 
 {
   imports = [
@@ -102,6 +89,22 @@ in
     # See: https://github.com/NixOS/nixpkgs/issues/254807
     swraid.enable = lib.mkForce false;
   };
+
+  systemd.services.moveWirelessConfig = {
+    wantedBy = [ "multi-user.target" ];
+    before = [ "network.target" ];
+    requires = [ "local-fs.target" ];
+    after = [ "local-fs.target"];
+    script = ''
+      if [ -f /boot/wireless.env ]; then
+        mv /boot/wireless.env /run/secrets/wireless.env
+      fi
+    '';
+    serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+    };
+  };
  
   environment = {
     systemPackages = with pkgs; [
@@ -115,11 +118,12 @@ in
     nameservers = [ "208.67.222.222" "8.8.8.8"];
     interfaces."wlan0".useDHCP = true;
     wireless = {
+      environmentFile = "/run/secrets/wireless.env";
       enable = true;
       interfaces = ["wlan0"];
       networks = {
-        "${config_ssid}" = {
-          psk = "${config_pass}";
+        "@PROVISION_SSID@" = {
+          psk = "@PROVISION_PASS@";
         };
       };
     };
