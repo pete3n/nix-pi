@@ -5,7 +5,7 @@ let
     envVars = builtins.parseDrv {
         inherit (builtins) fetchurl;
         name = "env-vars";
-        builder = "${bash}/bin/bash";
+        builder = "${pkgs.bash}/bin/bash";
         args = [ "-c" "echo \"\$0\"" "${envFile}" ];
     };
 
