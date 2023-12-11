@@ -1,0 +1,12 @@
+--- a/arch/arm/boot/dts/broadcom/bcm2837-rpi-zero-2-w.dts	2023-12-10 06:59:12.362323142 +0000
++++ b/arch/arm/boot/dts/broadcom/bcm2837-rpi-zero-2-w.dts	2023-12-11 12:26:35.668693854 +0000
+@@ -6,7 +6,7 @@
+ /dts-v1/;
+ #include "bcm2837.dtsi"
+ #include "bcm2836-rpi.dtsi"
+ #include "bcm283x-rpi-led-deprecated.dtsi"
+-#include "bcm283x-rpi-usb-otg.dtsi"
++#include "bcm283x-rpi-usb-host.dtsi"
+ #include "bcm283x-rpi-wifi-bt.dtsi"
+ 
+ / {
