@@ -11,5 +11,5 @@ Clone this branch -
 Ensure flakes are enabled and that you can build aarch64 binaries on your system
 Then build with -
 ```
-    nix build -L .#nixosConfiguration.zerow2w.config.system.build.sdImage
+    nix build -L .#nixosConfiguration.zero2w.config.system.build.sdImage
 ```
