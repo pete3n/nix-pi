@@ -27,14 +27,14 @@ fi
 
 mkdir -p "$MOUNT_DIR"
 
-if ! mount "${LOOP_DEVICE}p1" "$MOUNT_DIR"; then
+if ! mount "${LOOP_DEVICE}p2" "$MOUNT_DIR"; then
     echo "Failed to mount the first partition of $LOOP_DEVICE"
     losetup -d "$LOOP_DEVICE"
     exit 1
 fi
 
-if ! cp "$WIRELESS_ENV_PATH" "$MOUNT_DIR/"; then
-    echo "Failed to copy $WIRELESS_ENV_PATH to $MOUNT_DIR"
+if ! cp "$WIRELESS_ENV_PATH" "$MOUNT_DIR/boot/"; then
+    echo "Failed to copy $WIRELESS_ENV_PATH to $MOUNT_DIR/boot/"
     umount "$MOUNT_DIR"
     losetup -d "$LOOP_DEVICE"
     exit 1
