@@ -96,6 +96,10 @@
     requires = [ "local-fs.target" ];
     after = [ "local-fs.target"];
     script = ''
+      if [ ! -d /run/secrets ]; then
+        mkdir -p /run/secrets
+      fi
+
       if [ -f /boot/wireless.env ]; then
         mv /boot/wireless.env /run/secrets/wireless.env
       fi
