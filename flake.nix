@@ -8,7 +8,7 @@
 
   outputs = { self, nixpkgs, deploy-rs }: 
     let
-      nonFlakePkgs = nixpkgs.legacyPackage.86_64-linux;
+      nonFlakePkgs = nixpkgs.legacyPackages.x86_64-linux;
     in rec {
       nixosConfigurations.zero2w = nonFlakePkgs.pkgsCross.aarch64-multiplatform.nixos {
         imports = [
