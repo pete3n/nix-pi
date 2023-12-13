@@ -5,12 +5,17 @@
     ./sd-image.nix
   ];
 
+  nixpkgs.hostPlatform = "aarch64-linux";
   system.stateVersion = "unstable";
 
-  nixpkgs.hostPlatform = "aarch64-linux";
-
-  # ! Need a trusted user for deploy-rs.
-  nix.settings.trusted-users = ["@wheel"];
+  nix = {
+    settings = {
+        # ! Need a trusted user for deploy-rs.
+        trusted-users = ["@wheel"];
+        # Enable flakes
+        experimental-features = [ "nix-command" "flakes" ];
+    };
+  };
 
   zramSwap = {
     enable = true;
@@ -69,7 +74,7 @@
       in
         pkgs.recurseIntoAttrs (pkgs.linuxPackagesFor linux_zero2w);
 
-    # Place any modules you need during stage 1 of the boot here
+    # Place any modules you need during stage 1 of the boot here:
     #initrd.availableKernelModules = [
     #  "ehci_hcd" 
     #  "usbhid" 
