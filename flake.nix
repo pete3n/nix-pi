@@ -16,9 +16,6 @@
        };
       images.zero2w = nixosConfigurations.zero2w.config.system.build.sdImage; 
 
-      # Build the image by default with nix build
-      packages.aarch64-linux.default = self.images.zero2w;
-      defaultPackage.aarch64-linux = self.packages.aarch64-linux.default;
     };
 
     deploy = {
