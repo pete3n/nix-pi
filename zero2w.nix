@@ -9,7 +9,6 @@
   system.stateVersion = "unstable";
 
   nix = {
-    package
     settings = {
         # ! Need a trusted user for deploy-rs.
         trusted-users = ["@wheel"];
