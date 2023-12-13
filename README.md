@@ -7,8 +7,8 @@ Thanks to [plmercereau's example](https://github.com/plmercereau/nixos-pi-zero-2
 flake that this was based on.
 
 ## Build instructions:
-Ensure [Flakes are enabled](https://nixos.wiki/wiki/Flakes) on your system and that
-your system can build aarch64-linux binaries.
+Ensure [Flakes are enabled](https://nixos.wiki/wiki/Flakes) on your system.
+This flake will cross-compile an aarch64-linux system on an x86_64-linux system.
 
 Clone this branch -
 ```
