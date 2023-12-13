@@ -18,7 +18,3 @@ Change to the root directory where the flake.nix file is located, then build wit
 ```
     nix build -L .#nixosConfigurations.images.zero2w
 ```
-or just -
-```
-    nix build -L
-```
