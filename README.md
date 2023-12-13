@@ -7,14 +7,18 @@ Thanks to [plmercereau's example](https://github.com/plmercereau/nixos-pi-zero-2
 flake that this was based on.
 
 ## Build instructions:
-This flake needs a native aarch64-linux system to build on.
+Ensure [Flakes are enabled](https://nixos.wiki/wiki/Flakes) on your system and that
+your system can build aarch64-linux binaries.
 
 Clone this branch -
 ```
     git clone -b zero-2-w-native https://github.com/pete3n/nix-pi.git
 ```
-Ensure [Flakes are enabled](https://nixos.wiki/wiki/Flakes) on your system,
-then build with -
+Change to the root directory where the flake.nix file is located, then build with -
 ```
     nix build -L .#nixosConfigurations.images.zero2w
+```
+or just -
+```
+    nix build -L
 ```
