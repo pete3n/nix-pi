@@ -12,17 +12,13 @@
           modules = [
             "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
             ./zero2w.nix
-#            ({ pkgs, ... }: {
-#                nixpkgs.overlays = [
-#                  (final: super: {
-#                    makeModulesClosure = x:
-#                      super.makeModulesClosure (x // { allowMissing = true; });
-#                  })
-#                ];
-#            })
           ];
        };
       images.zero2w = nixosConfigurations.zero2w.config.system.build.sdImage; 
+
+      # Build the image by default with nix build
+      packages.aarch64-linux.imagePackage = self.images.zero2w;
+      defaultPackage.aarch64-linux = self.packages.aarch64-linux.imagePackage;
     };
 
     deploy = {
