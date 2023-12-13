@@ -22,7 +22,7 @@
 #            })
           ];
        };
-      images.zero2w = nixosConfigurations.zero2.config.system.build.sdImage; 
+      images.zero2w = nixosConfigurations.zero2w.config.system.build.sdImage; 
     };
 
     deploy = {
