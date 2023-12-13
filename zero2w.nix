@@ -42,14 +42,12 @@
     pkgs.raspberrypiWirelessFirmware
   ];
 
-  #environment.noXlibs = lib.mkForce false;
-
   boot = {
     # Use the 6.6.5 kernel and apply the usb host patch for the Zero 2 W
     # If you change kernels you must verify that the patch file is still valid
     # For the /arch/arm/boot/dts/broadcom/bcm2837-rpi-zero-2-w.dts file
     kernelPackages = let
-	linux_zero2w_pkg = { fetchurl, buildLinux, ... } @ args:
+	linux_zero2w_pkg = { fetchurl, buildLinux, ... }@ args:
 	  buildLinux (args // rec {
 	    version = "6.6.5";
 	    modDirVersion = version;

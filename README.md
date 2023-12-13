@@ -13,8 +13,8 @@ Clone this branch -
 ```
     git clone -b zero-2-w-native https://github.com/pete3n/nix-pi.git
 ```
-Ensure [Flakes are enabled](https://nixos.wiki/wiki/Flakes) and that you can build aarch64 binaries on your system
-Then build with -
+Ensure [Flakes are enabled](https://nixos.wiki/wiki/Flakes) and that you can build 
+aarch64 binaries on your system, then build with -
 ```
-    nix build -L .#nixosConfigurations.zero2w.config.system.build.sdImage
+    nix build -L .#nixosConfigurations.images.zero2w
 ```
