@@ -18,15 +18,22 @@
 
     };
 
-    deploy = {
-      user = "admin";
-      nodes = {
-        zero2w = {
-          hostname = "nixos";
-          profiles.system.path =
-            deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.zero2w;
+      deploy = {
+        nodes = {
+          zero2w = {
+            sshUser = "admin";
+            autoRollback = true;
+            magicRollback = true;
+            remoteBuile = false;
+            hostname = "nixos";
+            profiles = {
+                system = {
+                    user = "admin";
+                    path = deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.zero2w;
+                };
+            };
+          };
         };
-      };
-    };
+      checks = builtins.mappAttrs (system: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;  };
   };
 }
