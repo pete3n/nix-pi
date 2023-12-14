@@ -26,10 +26,10 @@
         remoteBuile = false;
         profiles.system = {
             user = "admin";
-            path = deploy-rs.lib.aarch64-linux.activate.nixos nixosConfigurations.zero2w;
+            # Using x86_64 to allow pushing configs without NixOS and binfmt support
+            path = deploy-rs.lib.x86_64-linux.activate.nixos nixosConfigurations.zero2w;
         };
       };
 
-      #checks = builtins.mapAttrs (system: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;
     };
 }

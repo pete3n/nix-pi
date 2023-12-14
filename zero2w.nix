@@ -93,6 +93,10 @@
     # Avoids warning: mdadm: Neither MAILADDR nor PROGRAM has been set. This will cause the `mdmon` service to crash.
     # See: https://github.com/NixOS/nixpkgs/issues/254807
     swraid.enable = lib.mkForce false;
+
+    # Allow emulating x86_64. This is needed by deploy-rs so that we can push configs
+    # from hosts that don't support aarch64 and can't run NixOS with binfmt for aarch64
+    binfmt.emulatedSystems = [ "x86_64-linux" ];
   };
 
   systemd.services.moveWirelessConfig = {
