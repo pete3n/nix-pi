@@ -25,8 +25,7 @@
         magicRollback = true;
         remoteBuile = false;
         profiles.system = {
-            user = "admin";
-            # Using x86_64 to allow pushing configs without NixOS and binfmt support
+            user = "admin"; # Using x86_64 to allow pushing configs without NixOS and binfmt support
             path = deploy-rs.lib.x86_64-linux.activate.nixos nixosConfigurations.zero2w;
         };
       };
