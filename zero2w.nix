@@ -9,12 +9,14 @@
   system.stateVersion = "unstable";
 
   nix = {
-    settings = {
-        # ! Need a trusted user for deploy-rs.
-        trusted-users = ["@wheel"];
-        # Enable flakes
-        experimental-features = [ "nix-command" "flakes" ];
-    };
+
+    # ! Need a trusted user for deploy-rs.
+    settings.trusted-users = ["@wheel"];
+
+    # Enable flake support
+    extraOptions = ''
+        experimental-features = nix-command flakes;
+    '';
   };
 
   zramSwap = {
