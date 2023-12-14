@@ -18,24 +18,18 @@
       };
       images.zero2w = nixosConfigurations.zero2w.config.system.build.sdImage; 
 
-      deploy = {
-        nodes = {
-          zero2w = {
-            sshUser = "admin";
-            autoRollback = true;
-            magicRollback = true;
-            remoteBuile = false;
-            hostname = "nixos";
-            profiles = {
-                system = {
-                    user = "admin";
-                    path = deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.zero2w;
-                };
-            };
-          };
+      deploy.nodes.zero2w = {
+        hostname = "nixos";
+        sshUser = "admin";
+        autoRollback = true;
+        magicRollback = true;
+        remoteBuile = false;
+        profiles.system = {
+            user = "admin";
+            path = deploy-rs.lib.aarch64-linux.activate.nixos nixosConfigurations.zero2w;
         };
       };
 
-      checks = builtins.mapAttrs (system: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;
-  };
+      #checks = builtins.mapAttrs (system: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;
+    };
 }
