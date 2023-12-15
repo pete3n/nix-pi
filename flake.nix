@@ -4,9 +4,10 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     deploy-rs.url = "github:serokell/deploy-rs";
+    agenix.url = "github:ryantm/agenix";
   };
 
-  outputs = { self, nixpkgs, deploy-rs }: 
+  outputs = { self, nixpkgs, deploy-rs, agenix, ... }@inputs: 
     let
       nonFlakePkgs = nixpkgs.legacyPackages.x86_64-linux;
     in rec {
@@ -14,6 +15,7 @@
         imports = [
           "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
           ./zero2w.nix
+          agenix.nixosModules.default
         ];
       };
       images.zero2w = nixosConfigurations.zero2w.config.system.build.sdImage; 

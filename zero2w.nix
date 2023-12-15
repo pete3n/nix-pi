@@ -1,5 +1,4 @@
 { config, lib, modulesPath, pkgs, ... }: 
-
 {
   imports = [
     ./sd-image.nix
@@ -9,13 +8,11 @@
   system.stateVersion = "unstable";
 
   nix = {
-
     # ! Need a trusted user for deploy-rs.
     settings.trusted-users = ["@wheel"];
 
-    # Enable flake support
     extraOptions = ''
-        experimental-features = nix-command flakes;
+      experimental-features = nix-command flakes
     '';
   };
 
@@ -98,8 +95,29 @@
     # from hosts that don't support aarch64 and can't run NixOS with binfmt for aarch64
     binfmt.emulatedSystems = [ "x86_64-linux" ];
   };
+ 
+  environment = {
+    systemPackages = with pkgs; [
+      wpa_supplicant
+      iw
+      tmux
+    ];
+  };
 
-  systemd.services.moveWirelessConfig = {
+  # We need to use a shared path on both the build host and the remote target
+  # machine so that we can build the config, which is why /run/secrets is used
+  # touch empty placeholder files on the build machine in this path so you can
+  # evaluate the flake without errors
+  age = {
+    secrets = {
+      admin_pass.file = /run/secrets/admin_pass.age;
+      provision_net_ssid.file = /run/secrets/provision_net_pass.age;
+      provision_net_pass.file = /run/secrets/provision_net_pass.age;
+    };
+    identityPaths = [ "/root/.ssh/zero2w" "/home/admin/.ssh/admin" ];
+  };
+
+  systemd.services.copyWirelessSecrets = {
     wantedBy = [ "multi-user.target" ];
     before = [ "network.target" ];
     requires = [ "local-fs.target" ];
@@ -108,23 +126,19 @@
       if [ ! -d /run/secrets ]; then
         mkdir -p /run/secrets
       fi
+        
+      ssid=$(cat ${config.age.secrets."provision_net_ssid".path})
+      password=$(cat ${config.age.secrets."provision_net_pass".path})
 
-      if [ -f /boot/wireless.env ]; then
-        mv /boot/wireless.env /run/secrets/wireless.env
-      fi
+      cat <<EOF > /run/secrets/wireless.env
+      WIRELESS_SSID=$ssid
+      WIRELESS_PASSWORD=$password
+      EOF
     '';
     serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
     };
-  };
- 
-  environment = {
-    systemPackages = with pkgs; [
-      wpa_supplicant
-      iw
-      tmux
-    ];
   };
 
   networking = {
@@ -136,11 +150,27 @@
       interfaces = ["wlan0"];
       networks = {
         "@PROVISION_SSID@" = {
-          psk = "@PROVISION_PASS@";
+            psk = "@PROVISION_PASS@";
         };
       };
     };
   };
+
+  users = {
+    users.admin = {
+      isNormalUser = true;
+      createHome = true;
+      home = "/home/admin";
+      group = "users";
+      extraGroups = [ "wheel" ];
+      hashedPasswordFile = config.age.secrets."admin_pass".path;
+    };
+  };
+
+  users.users.admin.openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBZPxWbmIliI+RnJN0zMvPJ/KEy3XOQ+iKyr6IpZ30ps admin_user_key" ];
+
+  # Allow wheel group sudo access
+  security.sudo.wheelNeedsPassword = true;
 
   # Enable OpenSSH out of the box.
   services.sshd.enable = true;
