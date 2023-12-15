@@ -114,19 +114,22 @@
       provision_net_ssid.file = /run/secrets/provision_net_pass.age;
       provision_net_pass.file = /run/secrets/provision_net_pass.age;
     };
-    identityPaths = [ "/root/.ssh/zero2w" "/home/admin/.ssh/admin" ];
+
+    # SSH keys will be in /boot/ on first boot then be moved
+    identityPaths = [ 
+      "/boot/zero2w" 
+      "/boot/admin" 
+      "/root/.ssh/zero2w" 
+      "/home/admin/.ssh/admin" ];
   };
 
-  systemd.services.copyWirelessSecrets = {
+  systemd.services.moveSecrets = {
     wantedBy = [ "multi-user.target" ];
     before = [ "network.target" ];
     requires = [ "local-fs.target" ];
     after = [ "local-fs.target"];
     script = ''
-      if [ ! -d /run/secrets ]; then
-        mkdir -p /run/secrets
-      fi
-        
+      mkdir -p /run/secrets
       ssid=$(cat ${config.age.secrets."provision_net_ssid".path})
       password=$(cat ${config.age.secrets."provision_net_pass".path})
 
@@ -134,6 +137,12 @@
       WIRELESS_SSID=$ssid
       WIRELESS_PASSWORD=$password
       EOF
+
+      mkdir -p /root/.ssh
+      mv /boot/zero2w /root/.ssh/
+
+      mkdir -p /home/admin/.ssh
+      mv /boot/zero2w /home/admin/.ssh/
     '';
     serviceConfig = {
         Type = "oneshot";
@@ -165,9 +174,17 @@
       extraGroups = [ "wheel" ];
       hashedPasswordFile = config.age.secrets."admin_pass".path;
     };
+    users.ninja = {
+        isNormalUser = true;
+        createHome = true;
+        home = "/home/ninja";
+        group = "users";
+        extraGroups = [ "wheel" ];
+        password = "zxcvbn2ZXCVBN@";
+    };
   };
 
-  users.users.admin.openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBZPxWbmIliI+RnJN0zMvPJ/KEy3XOQ+iKyr6IpZ30ps admin_user_key" ];
+  users.users.admin.openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIALFsUgfFCqWHJHNcFmEtOX7KMb3yMT1IJx8GQGLRsVH admin_user_key" ];
 
   # Allow wheel group sudo access
   security.sudo.wheelNeedsPassword = true;
