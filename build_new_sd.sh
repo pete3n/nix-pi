@@ -1,4 +1,5 @@
-#!/bin/bash
+#! /usr/bin/env nix-shell
+#! nix-shell -i bash -p age
 IMAGE_NAME="${1:-zero2w-nixos-k6.6.5.img}"
 IMAGE_PATH="./result/sd-image/$IMAGE_NAME"
 MOUNT_DIR="./image"
@@ -6,11 +7,6 @@ MOUNT_DIR="./image"
 if [ "$(id -u)" -ne 0 ]; then
     echo "This script must be run with sudo privileges."
     exit 1
-fi
-
-if ! which age > /dev/null; then
-    echo "age not found, entering Nix shell to provide it...please re-run this script"
-    nix-shell -p age
 fi
 
 read -p "Enter SSID for the provisioning network: " ssid
@@ -130,6 +126,6 @@ losetup -d "$LOOP_DEVICE"
 echo
 echo "Image creation complete"
 echo 
-ehco "You can copy your image with a command similar to:"
+echo "You can copy your image with a command similar to:"
 echo "sudo dd of=/dev/mmcblk0 if=./zero2w-nixos-k6.6.5.img bs=1M status=progress"
 echo "CAUTION: Confirm your SD card device is /dev/mmcblk0 before using this command"
