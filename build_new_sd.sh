@@ -58,26 +58,32 @@ EOF
 echo "Writing age encrypted files..."
 echo "$admin_password" | mkpasswd -m sha-512 -s > ./private/admin_hash
 age -R ./private/zero2w.pub -R ./private/admin.pub -e -i ./private/zero2w -i ./private/admin -o ./secrets/admin_pass.age ./private/admin_hash
-echo "$ssid" | age -R ./private/zero2w.pub -R ./private/admin.pub -e -o ./secrets/provision_net_SSID.age
+echo "$ssid" | age -R ./private/zero2w.pub -R ./private/admin.pub -e -o ./secrets/provision_net_ssid.age
 echo "$password" | age -R ./private/zero2w.pub -R ./private/admin.pub -e -o ./secrets/provision_net_pass.age
 
-# Create empty placeholder files for build environment so it will evaluate
+# Copy age secrets files to working directory so nix can build them
 echo
-echo "Creating /run/secrets build placeholders..."
-mkdir -p /run/secrets
-touch /run/secrets/admin_pass.age
-touch /run/secrets/provision_net_ssid.age
-touch /run/secrets/provision_net_pass.age
+echo "Creating /run/zero2w-build-secrets build placeholders..."
+mkdir -p /run/zero2w-build-secrets
+cp ./secrets/*.age /run/zero2w-build-secrets/
 echo
+
 echo "Adding admin public key to authorized keys in config..."
 admin_pub_key=$(cat ./private/admin.pub)
 echo
 replacement_ssh="users.users.admin.openssh.authorizedKeys.keys = [ \"$admin_pub_key\" ];"
 sed -i "s|users.users.admin.openssh.authorizedKeys.keys = \[.*\];|$replacement_ssh|" ./zero2w.nix
 echo
+
 echo "Building SD card image..."
 nix build .#images.zero2w
+exit_status=$?
+if [ $exit_status -ne 0 ]; then
+    echo "Error detected in build process, exiting..."
+    exit $exit_status
+fi
 echo
+
 echo "Copying result image..."
 cp $IMAGE_PATH ./
 echo
