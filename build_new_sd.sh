@@ -3,6 +3,7 @@
 IMAGE_NAME="${1:-zero2w-nixos-k6.6.5.img}"
 IMAGE_PATH="./result/sd-image/$IMAGE_NAME"
 MOUNT_DIR="./image"
+OUTPUT_DIR="./output"
 
 if [ "$(id -u)" -ne 0 ]; then
     echo "This script must be run with sudo privileges."
@@ -85,26 +86,25 @@ fi
 echo
 
 echo "Copying result image..."
-cp $IMAGE_PATH ./
+cp $IMAGE_PATH $OUTPUT_DIR
 echo
-chmod +w $IMAGE_NAME
+chmod +w ${OUTPUT_DIR}/$IMAGE_NAME
 echo
 echo "Mounting image..."
-LOOP_DEVICE=$(losetup -Pf --show "$IMAGE_NAME")
+LOOP_DEVICE=$(losetup -Pf --show "${OUTPUT_DIR}/$IMAGE_NAME")
 if [ -z "$LOOP_DEVICE" ]; then
     echo "Failed to create loop device."
     exit 1
 fi
 
 mkdir -p "$MOUNT_DIR"
-
 if ! mount "${LOOP_DEVICE}p2" "$MOUNT_DIR"; then
     echo "Failed to mount the second partition of $LOOP_DEVICE"
     losetup -d "$LOOP_DEVICE"
     exit 1
 fi
-
 echo
+
 echo "Copying ssh keys..."
 if ! cp "./private/zero2w" "$MOUNT_DIR/boot/"; then
     echo "Failed to copy private system SSH key to $MOUNT_DIR/boot/"
@@ -122,8 +122,8 @@ if ! cp "./private/admin" "$MOUNT_DIR/boot/"; then
     rmdir "$MOUNT_DIR"
     exit 1
 fi
-
 echo
+
 echo "Unmounting image..."
 umount "$MOUNT_DIR"
 rmdir "$MOUNT_DIR"
@@ -137,5 +137,5 @@ echo
 echo "Image creation complete"
 echo 
 echo "You can copy your image with a command similar to:"
-echo "sudo dd of=/dev/mmcblk0 if=./zero2w-nixos-k6.6.5.img bs=1M status=progress"
+echo "sudo dd of=/dev/mmcblk0 if=./output/zero2w-nixos-k6.6.5.img bs=1M status=progress"
 echo "CAUTION: Confirm your SD card device is /dev/mmcblk0 before using this command"

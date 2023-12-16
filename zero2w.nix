@@ -149,7 +149,7 @@
     wireless = {
       environmentFile = "/etc/wpa_supplicant/wireless.env";
       enable = true;
-      interfaces = ["wlan0"];
+      interfaces = [ "wlan0" ];
       networks = {
         "@PROVISION_NET_SSID@" = {
             psk = "@PROVISION_NET_PASS@";
@@ -169,14 +169,15 @@
     };
   };
 
-  users.users.admin.openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINbaobJ54Mey4weJbs5GOGRClSh+zcVOfYCh8lckHM4S admin_user_key" ];
+  users.users.admin.openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG7r8TkS19MbBIWg2b/GCFI343zTp/UPt7Wno0sJhv4s admin_user_key" ];
 
-  # Allow wheel group sudo access
-  security.sudo.wheelNeedsPassword = true;
+  # Allow wheel group passwordless sudo access
+  security.sudo = {
+    enable = true;
+    wheelNeedsPassword = false;
+  };
 
-  # Enable OpenSSH out of the box.
   services.sshd.enable = true;
 
-  # NTP time sync.
   services.timesyncd.enable = true;
 }
