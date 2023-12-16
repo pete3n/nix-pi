@@ -1,14 +1,16 @@
-# pi zero-2-w cross-compile config
+
+# pi zero-2-w cross-compile branch
 This branch contains a NixOS configuration specific for the Raspberry Pi Zero 2 W. 
 The flake in this repo contains build targets for an SD card image based on NixOS unstable 
 and linux kernel version 6.6.5. USB host mode is enabled with a patch for the
 zero2w DTS source.
 
-Thanks to [Artemis Everfree's tutorial](https://artemis.sh/2023/06/06/cross-compile-nixos-for-great-good.html)
-for helping me figure out how to cross-compile on systems using only Nix. It is possible
-emulated system architectures on NixOS with QEMU and the binfmt setting, however this
-is the only method I have found that allows building aarch64 targets on x86_64
-systems not running NixOS.
+Thanks to [plmercereau's example](https://github.com/plmercereau/nixos-pi-zero-2)
+showing how to build an SD image for the Pi 2 Zero, and to [Artemis Everfree's tutorial](https://artemis.sh/2023/06/06/cross-compile-nixos-for-great-good.html)
+for helping me figure out how to cross-compile on systems using only Nix. While it is 
+possible to build aarch64-linux targets on x86_64-linux NixOS with QEMU and the binfmt 
+setting, this is the only method I have found that allows building aarch64 targets on 
+x86_64-linux systems not running NixOS.
 
 ## Build instructions:
 Ensure [Flakes are enabled](https://nixos.wiki/wiki/Flakes) for Nix, and that you 
