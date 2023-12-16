@@ -7,8 +7,8 @@ zero2w DTS source.
 Thanks to [Artemis Everfree's tutorial](https://artemis.sh/2023/06/06/cross-compile-nixos-for-great-good.html)
 for helping me figure out how to cross-compile on systems using only Nix. It is possible
 emulated system architectures on NixOS with QEMU and the binfmt setting, however this
-is the only method I have found that allows cross-compiling which allows the image to
-be build on systems not running NixOS.
+is the only method I have found that allows building aarch64 targets on x86_64
+systems not running NixOS.
 
 ## Build instructions:
 Ensure [Flakes are enabled](https://nixos.wiki/wiki/Flakes) for Nix, and that you 

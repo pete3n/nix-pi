@@ -2,3 +2,5 @@
 *.env
 /nix/store
 ./private
+./output
+./image
