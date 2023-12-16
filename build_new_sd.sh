@@ -1,5 +1,5 @@
 #! /nix/var/nix/profiles/default/bin/nix-shell
-#! nix-shell -i bash -p age
+#! nix-shell -i bash -p age mkpasswd
 IMAGE_NAME="${1:-zero2w-nixos-k6.6.5.img}"
 IMAGE_PATH="./result/sd-image/$IMAGE_NAME"
 MOUNT_DIR="./image"
