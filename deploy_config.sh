@@ -1,4 +1,4 @@
-#! /usr/bin/env nix-shell
+#! /nix/var/nix/profiles/default/bin/nix-shell
 #! nix-shell -i bash -p deploy-rs
 
 if [ "$(id -u)" -ne 0 ]; then
