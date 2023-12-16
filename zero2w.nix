@@ -104,18 +104,15 @@
     ];
   };
 
-  # We need to use a shared path on both the build host and the remote target
-  # machine so that we can build the config, which is why /run/secrets is used
-  # touch empty placeholder files on the build machine in this path so you can
-  # evaluate the flake without errors
   age = {
     secrets = {
-      admin_pass.file = /run/secrets/admin_pass.age;
-      provision_net_ssid.file = /run/secrets/provision_net_pass.age;
-      provision_net_pass.file = /run/secrets/provision_net_pass.age;
+      admin_pass.file = /run/zero2w-build-secrets/admin_pass.age;
+      provision_net_ssid.file = /run/zero2w-build-secrets/provision_net_ssid.age;
+      provision_net_pass.file = /run/zero2w-build-secrets/provision_net_pass.age;
     };
 
-    # SSH keys will be in /boot/ on first boot then be moved
+    # SSH keys will be in /boot/ on first boot, and then moved by the activation script
+    # Those paths should be removed after initial configuration
     identityPaths = [ 
       "/boot/zero2w" 
       "/boot/admin" 
@@ -123,43 +120,39 @@
       "/home/admin/.ssh/admin" ];
   };
 
-  systemd.services.moveSecrets = {
-    wantedBy = [ "multi-user.target" ];
-    before = [ "network.target" ];
-    requires = [ "local-fs.target" ];
-    after = [ "local-fs.target"];
-    script = ''
-      mkdir -p /run/secrets
+  system.activationScripts.moveSecrets = {
+    text = ''
+      mkdir -p /etc/wpa_supplicant
       ssid=$(cat ${config.age.secrets."provision_net_ssid".path})
       password=$(cat ${config.age.secrets."provision_net_pass".path})
 
-      cat <<EOF > /run/secrets/wireless.env
-      WIRELESS_SSID=$ssid
-      WIRELESS_PASSWORD=$password
+      cat <<EOF > /etc/wpa_supplicant/wireless.env
+      PROVISION_NET_SSID=$ssid
+      PROVISION_NET_PASS=$password
       EOF
 
-      mkdir -p /root/.ssh
-      mv /boot/zero2w /root/.ssh/
+      if [ -f /boot/zero2w ]; then
+        mkdir -p /root/.ssh
+        mv /boot/zero2w /root/.ssh/
+      fi
 
-      mkdir -p /home/admin/.ssh
-      mv /boot/zero2w /home/admin/.ssh/
+      if [ -f /boot/admin ]; then
+        mkdir -p /home/admin/.ssh
+        mv /boot/admin /home/admin/.ssh/
+      fi
     '';
-    serviceConfig = {
-        Type = "oneshot";
-        RemainAfterExit = true;
-    };
   };
 
   networking = {
     nameservers = [ "208.67.222.222" "8.8.8.8"];
     interfaces."wlan0".useDHCP = true;
     wireless = {
-      environmentFile = "/run/secrets/wireless.env";
+      environmentFile = "/etc/wpa_supplicant/wireless.env";
       enable = true;
       interfaces = ["wlan0"];
       networks = {
-        "@PROVISION_SSID@" = {
-            psk = "@PROVISION_PASS@";
+        "@PROVISION_NET_SSID@" = {
+            psk = "@PROVISION_NET_PASS@";
         };
       };
     };
@@ -174,17 +167,9 @@
       extraGroups = [ "wheel" ];
       hashedPasswordFile = config.age.secrets."admin_pass".path;
     };
-    users.ninja = {
-        isNormalUser = true;
-        createHome = true;
-        home = "/home/ninja";
-        group = "users";
-        extraGroups = [ "wheel" ];
-        password = "zxcvbn2ZXCVBN@";
-    };
   };
 
-  users.users.admin.openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIALFsUgfFCqWHJHNcFmEtOX7KMb3yMT1IJx8GQGLRsVH admin_user_key" ];
+  users.users.admin.openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINbaobJ54Mey4weJbs5GOGRClSh+zcVOfYCh8lckHM4S admin_user_key" ];
 
   # Allow wheel group sudo access
   security.sudo.wheelNeedsPassword = true;

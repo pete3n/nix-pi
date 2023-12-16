@@ -128,6 +128,10 @@ echo "Unmounting image..."
 umount "$MOUNT_DIR"
 rmdir "$MOUNT_DIR"
 losetup -d "$LOOP_DEVICE"
+echo
+
+echo "Cleaning up temporary build secrets..."
+rm /run/zero2w-build-secrets -rf
 
 echo
 echo "Image creation complete"
