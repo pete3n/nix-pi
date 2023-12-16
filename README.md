@@ -149,6 +149,96 @@ build applies the following source patch:
  / {
 ```
 which will build the DTB in USB host mode. It may also be possible to achieve this with an
-overlay, but it seems like there were mixed results, and this is guaranteed to work.
+overlay, but it seems like there were mixed results online, and this is guaranteed to work.
 
+```
+age = {
+    secrets = {
+      admin_pass.file = /run/zero2w-build-secrets/admin_pass.age;
+      provision_net_ssid.file = /run/zero2w-build-secrets/provision_net_ssid.age;
+      provision_net_pass.file = /run/zero2w-build-secrets/provision_net_pass.age;
+    };
+
+    # SSH keys will be in /boot/ on first boot, and then moved by the activation script
+    # Those paths should be removed after initial configuration
+    identityPaths = [ 
+      "/boot/zero2w" 
+      "/boot/admin" 
+      "/root/.ssh/zero2w" 
+      "/home/admin/.ssh/admin" ];
+  };
+```
+I use agenix to encrypted the secrets. They need to be in an absolute path on the build
+system for Nix to included them when building the store. Either /run or /tmp make sense
+for this. 
+* NOTE: If these files are missing during building, deploying, or checking the config
+Nix will throw an error saying it cannot find the age files.
+* The /root and /home directories don't exist until the SD card it booted into Nix, so
+the SSH keys are copied to /boot on the SD card and then moved during bootup
+
+```
+system.activationScripts.moveSecrets = {
+    text = ''
+      mkdir -p /etc/wpa_supplicant
+      ssid=$(cat ${config.age.secrets."provision_net_ssid".path})
+      password=$(cat ${config.age.secrets."provision_net_pass".path})
+
+      cat <<EOF > /etc/wpa_supplicant/wireless.env
+      PROVISION_NET_SSID=$ssid
+      PROVISION_NET_PASS=$password
+      EOF
+
+      if [ -f /boot/zero2w ]; then
+        mkdir -p /root/.ssh
+        mv /boot/zero2w /root/.ssh/
+      fi
+
+      if [ -f /boot/admin ]; then
+        mkdir -p /home/admin/.ssh
+        mv /boot/admin /himpme/admin/.ssh/
+      fi
+    '';
+  };
+```
+The activation script moves the SSH keys and creates the wireless.env file on bootup
+
+```
+networking = {
+    nameservers = [ "208.67.222.222" "8.8.8.8"];
+    interfaces."wlan0".useDHCP = true;
+    wireless = {
+      environmentFile = "/etc/wpa_supplicant/wireless.env";
+      enable = true;
+      interfaces = [ "wlan0" ];
+      networks = {
+        "@PROVISION_NET_SSID@" = {
+            psk = "@PROVISION_NET_PASS@";
+        };
+      };
+    };
+  };
+
+```
+I referenced the variables in the wireless.env file for the SSID and password because
+I couldn't find a good way to read them from the age config path, which is a file.
+
+```
+  users = {
+    users.admin = {
+      isNormalUser = true;
+      createHome = true;
+      home = "/home/admin";
+      group = "users";
+      extraGroups = [ "wheel" ];
+      hashedPasswordFile = config.age.secrets."admin_pass".path;
+    };
+  };
+
+  users.users.admin.openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG7r8TkS19MbBIWg2b/GCFI343zTp/UPt7Wno0sJhv4s admin_user_key" ];
+```
+The user config has a hashedPasswordFile property which accepts a file as input, so
+I can directly reference the age.secrets path here.
+
+The authorizedKeys.key is add by the build script which copies over the public key
+from the admin user to here.
 
