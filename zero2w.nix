@@ -95,26 +95,6 @@
     swraid.enable = lib.mkForce false;
   };
 
-  systemd.services.moveWirelessConfig = {
-    wantedBy = [ "multi-user.target" ];
-    before = [ "network.target" ];
-    requires = [ "local-fs.target" ];
-    after = [ "local-fs.target"];
-    script = ''
-      if [ ! -d /run/secrets ]; then
-        mkdir -p /run/secrets
-      fi
-
-      if [ -f /boot/wireless.env ]; then
-        mv /boot/wireless.env /run/secrets/wireless.env
-      fi
-    '';
-    serviceConfig = {
-        Type = "oneshot";
-        RemainAfterExit = true;
-    };
-  };
- 
   environment = {
     systemPackages = with pkgs; [
       wpa_supplicant
@@ -123,24 +103,80 @@
     ];
   };
 
+  age = {
+    secrets = {
+      admin_pass.file = /run/zero2w-build-secrets/admin_pass.age;
+      provision_net_ssid.file = /run/zero2w-build-secrets/provision_net_ssid.age;
+      provision_net_pass.file = /run/zero2w-build-secrets/provision_net_pass.age;
+    };
+
+    # SSH keys will be in /boot/ on first boot, and then moved by the activation script
+    # Those paths should be removed after initial configuration
+    identityPaths = [ 
+      "/boot/zero2w" 
+      "/boot/admin" 
+      "/root/.ssh/zero2w" 
+      "/home/admin/.ssh/admin" ];
+  };
+
+  system.activationScripts.moveSecrets = {
+    text = ''
+      mkdir -p /etc/wpa_supplicant
+      ssid=$(cat ${config.age.secrets."provision_net_ssid".path})
+      password=$(cat ${config.age.secrets."provision_net_pass".path})
+
+      cat <<EOF > /etc/wpa_supplicant/wireless.env
+      PROVISION_NET_SSID=$ssid
+      PROVISION_NET_PASS=$password
+      EOF
+
+      if [ -f /boot/zero2w ]; then
+        mkdir -p /root/.ssh
+        mv /boot/zero2w /root/.ssh/
+      fi
+
+      if [ -f /boot/admin ]; then
+        mkdir -p /home/admin/.ssh
+        mv /boot/admin /home/admin/.ssh/
+      fi
+    '';
+  };
+
   networking = {
     nameservers = [ "208.67.222.222" "8.8.8.8"];
     interfaces."wlan0".useDHCP = true;
     wireless = {
-      environmentFile = "/run/secrets/wireless.env";
+      environmentFile = "/etc/wpa_supplicant/wireless.env";
       enable = true;
       interfaces = ["wlan0"];
       networks = {
-        "@PROVISION_SSID@" = {
-          psk = "@PROVISION_PASS@";
+        "@PROVISION_NET_SSID@" = {
+          psk = "@PROVISION_NET_PASS@";
         };
       };
     };
   };
 
-  # Enable OpenSSH out of the box.
+  users = {
+    users.admin = {
+      isNormalUser = true;
+      createHome = true;
+      home = "/home/admin";
+      group = "users";
+      extraGroups = [ "wheel" ];
+      hashedPasswordFile = config.age.secrets."admin_pass".path;
+    };
+  };
+
+  users.users.admin.openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG7r8TkS19MbBIWg2b/GCFI343zTp/UPt7Wno0sJhv4s admin_user_key" ];
+
+  # Allow wheel group passwordless sudo access
+  security.sudo = {
+    enable = true;
+    wheelNeedsPassword = false;
+  };
+
   services.sshd.enable = true;
 
-  # NTP time sync.
   services.timesyncd.enable = true;
 }
