@@ -56,7 +56,7 @@ on your local machine and then deploy it to the pi. This has several benefits:
 1. The pi zero 2 w will usually run out of RAM and crash when attempting to rebuild
 a system config for itself
 2. deploy-rs has several safety mechanisms which can rollback system breaking configs
-which would otherwise disconnect a remote system
+that would otherwise disconnect a remote system
 
 ## Configuration explanation
 ### flake.nix
@@ -77,8 +77,8 @@ which would otherwise disconnect a remote system
 
 This is the key for cross-compiling. We need to use the pkgsCross package to build our
 configuration for aarch64, however that is found in legacyPackages which don't support
-flakes (do my understanding). aarch64-multiplatform.nixos doesn't utilize modules as
-input so we import our configuration.
+flakes (to my understanding). aarch64-multiplatform.nixos doesn't utilize modules as
+input so we use import for our configuration.
 
 ```
       deploy.nodes.zero2w = {
@@ -99,3 +99,56 @@ for the deployment script, but it has to be included or deploy-rs will invalidat
 otherwise the switch-to-configuration script will have permission errors
 * using deploy-rs.lib.x86_64-linux allows us to execute natively on our x86_64-linux platform
 but will require the target Pi to be able to emulate x86_64
+
+### zero2w.nix
+```
+boot = {
+    # Use the 6.6.5 kernel and apply the usb host patch for the Zero 2 W
+    # If you change kernels you must verify that the patch file is still valid
+    # For the /arch/arm/boot/dts/broadcom/bcm2837-rpi-zero-2-w.dts file
+    kernelPackages = let
+	linux_zero2w_pkg = { fetchurl, buildLinux, ... }@ args:
+	  buildLinux (args // rec {
+	    version = "6.6.5";
+	    modDirVersion = version;
+
+	    src = fetchurl {
+      		url = "https://mirrors.edge.kernel.org/pub/linux/kernel/v6.x/linux-${version}.tar.gz";
+      		sha256 = "sha256-Q/DqpBwsuAfOH0Zy98aE9iH0PZbtqAvcOaOVxE2sxGc=";
+	    };
+
+	    kernelPatches = [
+	      ({ 
+	        name = "rpi-zero-2-w-usb-host";
+            patch = ./patches/bcm2837-rpi-zero-2-w-usb-host.patch;
+	      })
+	    ];
+	    
+	  } // (args.argsOverride or {}));
+    linux_zero2w = pkgs.callPackage linux_zero2w_pkg{};
+      in
+        pkgs.recurseIntoAttrs (pkgs.linuxPackagesFor linux_zero2w);
+```
+This is the key to what make this config different than all the other Pi Zero 2 W
+configs and images. The default kernel built for the Zero 2 W will create a broadcom
+DTB which sets the USB controller to OTG mode for DWC2. This will prevent any USB
+connected accessories (hubs, keyboards, wifi, cell modems, etc.) from working. This
+build applies the following source patch:
+```
+--- a/arch/arm/boot/dts/broadcom/bcm2837-rpi-zero-2-w.dts       2023-12-10 06:59:12.362323142 +0000
++++ b/arch/arm/boot/dts/broadcom/bcm2837-rpi-zero-2-w.dts       2023-12-11 12:26:35.668693854 +0000
+@@ -6,7 +6,7 @@
+ /dts-v1/;
+ #include "bcm2837.dtsi"
+ #include "bcm2836-rpi.dtsi"
+ #include "bcm283x-rpi-led-deprecated.dtsi"
+-#include "bcm283x-rpi-usb-otg.dtsi"
++#include "bcm283x-rpi-usb-host.dtsi"
+ #include "bcm283x-rpi-wifi-bt.dtsi"
+
+ / {
+```
+which will build the DTB in USB host mode. It may also be possible to achieve this with an
+overlay, but it seems like there were mixed results, and this is guaranteed to work.
+
+
