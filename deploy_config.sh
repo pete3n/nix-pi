@@ -40,4 +40,4 @@ deploy --hostname=${target_ip} --ssh-opts="-i""./private/admin" --magic-rollback
 echo
 
 echo "Cleaning up temporary build secrets..."
-rm /run/zero2w-build-secrets -rf
+sudo rm /run/zero2w-build-secrets -rf
