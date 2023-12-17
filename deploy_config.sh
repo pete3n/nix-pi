@@ -1,10 +1,5 @@
-#! /bin/bash 
-#
-if [ "$(id -u)" -ne 0 ]; then
-    echo "This script must be run with sudo privileges."
-    exit 1
-fi
-
+#! /usr/bin/env nix-shell
+#! nix-shell -i bash -p mkpasswd age deploy-rs
 ./check_env.sh
 exit_status=$?
 
@@ -17,6 +12,10 @@ case $exit_status in
         ;;
     1)
         NIX="/run/current-system/sw/bin/nix"
+        if [ "$(id -u)" -eq 0 ]; then
+            echo "This script should not be run as sudo when using Nix without NixOS"
+            exit 1
+        fi
         ;;
     2)
         NIX="/nix/var/nix/profiles/default/bin/nix"
@@ -32,8 +31,8 @@ echo
 
 # Copy age secrets files to working directory so nix can build them
 echo "Creating /run/zero2w-build-secrets build placeholders..."
-mkdir -p /run/zero2w-build-secrets
-cp ./secrets/*.age /run/zero2w-build-secrets/
+sudo mkdir -p /run/zero2w-build-secrets
+sudo cp ./secrets/*.age /run/zero2w-build-secrets/
 echo
 
 echo "Deploying config with deploy-rs..."
