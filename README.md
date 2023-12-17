@@ -4,17 +4,17 @@ The flake in this repo contains build targets for an SD card image based on NixO
 and linux kernel version 6.6.5. USB host mode is enabled with a patch for the
 zero2w DTS source.
 
-Thanks to [plmercereau's example](https://github.com/plmercereau/nixos-pi-zero-2)
-showing how to build an SD image for the Pi 2 Zero. This flake was testing by building
-on an AWS c7g.8xlarge aarch64 instance. It requires a native aarch64 build, though it
-can be built through aarch64 emulation through QEMU by adding:
+Shout out to [plmercereau's example](https://github.com/plmercereau/nixos-pi-zero-2)
+showing how to build an SD image for the Pi 2 Zero. This flake was tested by 
+building on an AWS c7g.8xlarge aarch64 instance. It requires an aarch64-linux system 
+to build on, though it can be built through aarch64 emulation with QEMU by adding:
 ```
 {
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 }
 ```
 To your NixOS configuration. I would recommend using the [cross-compile](https://github.com/pete3n/nix-pi/tree/zero-2-w-cross)
-branch instead though.
+branch instead.
 
 ## Build instructions:
 Ensure [Flakes are enabled](https://nixos.wiki/wiki/Flakes) on your system and that
@@ -22,16 +22,7 @@ your system can build aarch64-linux binaries.
 
 Clone this branch -
 ```
-    git clone -b zero-2-w-native https://github.com/pete3n/nix-pi.git
-```
-Change to the root directory where the flake.nix file is located, then build with -
-```
-    nix build -L .#nixosConfigurations.images.zero2w
-```
-
-Clone this branch with:
-```
-git clone -b zero-2-w-cross https://github.com/pete3n/nix-pi.git
+git clone -b zero-2-w-native https://github.com/pete3n/nix-pi.git
 ```
 Change to the nix-pi directory.
 
