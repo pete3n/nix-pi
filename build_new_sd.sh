@@ -100,7 +100,7 @@ sed -i "s|users.users.admin.openssh.authorizedKeys.keys = \[.*\];|$replacement_s
 echo
 
 echo "Building SD card image..."
-/nix/var/nix/profiles/default/bin/nix --extra-experimental-features nix-command --extra-experimental-features flakes build .#images.zero2w
+$NIX --extra-experimental-features nix-command --extra-experimental-features flakes build .#images.zero2w
 exit_status=$?
 if [ $exit_status -ne 0 ]; then
     echo "Error detected in build process, exiting..."
