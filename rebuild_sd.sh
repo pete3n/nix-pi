@@ -40,7 +40,7 @@ cp ./secrets/*.age /run/zero2w-build-secrets/
 echo
 
 echo "Building SD card image..."
-/nix/var/nix/profiles/default/bin/nix --extra-experimental-features "nix-command flakes" build .#images.zero2w
+$NIX --extra-experimental-features "nix-command flakes" build .#images.zero2w
 exit_status=$?
 if [ $exit_status -ne 0 ]; then
     echo "Error detected in build process, exiting..."
