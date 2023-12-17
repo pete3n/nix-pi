@@ -14,7 +14,7 @@ x86_64-linux systems not running NixOS.
 
 ## Build instructions:
 Ensure [Flakes are enabled](https://nixos.wiki/wiki/Flakes) for Nix, and that you 
-are running an x86_64-linux bases system.
+are running an x86_64-linux based system.
 
 Clone this branch with:
 ```
@@ -32,7 +32,7 @@ This script will walk you through configuration options for a new SD card image:
 connect to on boot to provide SSH access
 * The admin password is set for the admin user which will have sudo privileges
 * SSH keys for the admin user and system will be generated
-* agenix will use the SSH keys tou encrypt the admin password hash and WiFi information
+* agenix will use the SSH keys to encrypt the admin password hash and WiFi information
 so the encrypted age files can be stored in a repo
 * The age files are copied to a directory in /run so that Nix can copy them to the
 nix store for the SD card image
