@@ -12,13 +12,13 @@ case $exit_status in
         ;;
     1)
         NIX="/run/current-system/sw/bin/nix"
+        ;;
+    2)
+        NIX="/nix/var/nix/profiles/default/bin/nix"
         if [ "$(id -u)" -eq 0 ]; then
             echo "This script should not be run as sudo when using Nix without NixOS"
             exit 1
         fi
-        ;;
-    2)
-        NIX="/nix/var/nix/profiles/default/bin/nix"
         ;;
     *)
         echo "Error: Invalid environment or check_env.sh script not found."
