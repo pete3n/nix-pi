@@ -1,5 +1,5 @@
-#! /usr/bin/env nix-shell
-#! nix-shell -i bash -p mkpasswd age deploy-rs
+#! /bin/bash
+#
 ./check_env.sh
 exit_status=$?
 
