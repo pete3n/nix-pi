@@ -168,7 +168,7 @@
     };
   };
 
-  users.users.admin.openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG7r8TkS19MbBIWg2b/GCFI343zTp/UPt7Wno0sJhv4s admin_user_key" ];
+  users.users.admin.openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO1C/Hmk46Gy4cpMcbFcMozPQRdAUEZBDthqy7h2y0qe admin_user_key" ];
 
   # Allow wheel group passwordless sudo access
   security.sudo = {
