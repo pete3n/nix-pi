@@ -1,14 +1,37 @@
-#! /nix/var/nix/profiles/default/bin/nix-shell
-#! nix-shell -i bash -p age mkpasswd
-IMAGE_NAME="${1:-zero2w-nixos-k6.6.5.img}"
-IMAGE_PATH="./result/sd-image/$IMAGE_NAME"
-MOUNT_DIR="./image"
-OUTPUT_DIR="./output"
+#! /bin/bash
+#
 
 if [ "$(id -u)" -ne 0 ]; then
     echo "This script must be run with sudo privileges."
     exit 1
 fi
+
+./check_env.sh
+exit_status=$?
+
+case $exit_status in
+    0)
+        echo "Environment setup required. Running set_env.sh..."
+        ./set_env.sh
+        echo "Restarting the script..."
+        exec "$0" "$@"
+        ;;
+    1)
+        NIX="/run/current-system/sw/bin/nix"
+        ;;
+    2)
+        NIX="/nix/var/nix/profiles/default/bin/nix"
+        ;;
+    *)
+        echo "Error: Invalid environment or check_env.sh script not found."
+        exit 1
+        ;;
+esac
+
+IMAGE_NAME="${1:-zero2w-nixos-k6.6.5.img}"
+IMAGE_PATH="./result/sd-image/$IMAGE_NAME"
+MOUNT_DIR="./image"
+OUTPUT_DIR="./output"
 
 read -p "Enter SSID for the provisioning network: " ssid
 echo
@@ -77,7 +100,7 @@ sed -i "s|users.users.admin.openssh.authorizedKeys.keys = \[.*\];|$replacement_s
 echo
 
 echo "Building SD card image..."
-/nix/var/nix/profiles/default/bin/nix --extra-experimental-features "nix-command flakes" build .#images.zero2w
+$NIX --extra-experimental-features "nix-command flakes" build .#images.zero2w
 exit_status=$?
 if [ $exit_status -ne 0 ]; then
     echo "Error detected in build process, exiting..."
@@ -139,4 +162,4 @@ echo "Image creation complete"
 echo 
 echo "You can copy your image with a command similar to:"
 echo "sudo dd of=/dev/mmcblk0 if=./output/zero2w-nixos-k6.6.5.img bs=1M status=progress"
-echo "CAUTION: Confirm your SD card device is /dev/mmcblk0 before using this command"
+echo "CAUTION: Confirm your SD card device is /dev/mmcblk0 before using this command"t

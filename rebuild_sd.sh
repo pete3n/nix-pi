@@ -1,14 +1,32 @@
-#! /nix/var/nix/profiles/default/bin/nix-shell
-#! nix-shell -i bash -p age
-IMAGE_NAME="${1:-zero2w-nixos-k6.6.5.img}"
-IMAGE_PATH="./result/sd-image/$IMAGE_NAME"
-MOUNT_DIR="./image"
-OUTPUT_DIR="./output"
+#! /bin/bash 
+#
 
 if [ "$(id -u)" -ne 0 ]; then
     echo "This script must be run with sudo privileges."
     exit 1
 fi
+
+./check_env.sh
+exit_status=$?
+
+case $exit_status in
+    0)
+        echo "Environment setup required. Running set_env.sh..."
+        ./set_env.sh
+        echo "Restarting the script..."
+        exec "$0" "$@"
+        ;;
+    1)
+        NIX="/run/current-system/sw/bin/nix"
+        ;;
+    2)
+        NIX="/nix/var/nix/profiles/default/bin/nix"
+        ;;
+    *)
+        echo "Error: Invalid environment or check_env.sh script not found."
+        exit 1
+        ;;
+esac
 
 # Copy age secrets files to working directory so nix can build them
 echo "Creating /run/zero2w-build-secrets build placeholders..."
