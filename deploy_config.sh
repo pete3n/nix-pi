@@ -1,10 +1,5 @@
 #! /bin/bash 
 #
-if [ "$(id -u)" -ne 0 ]; then
-    echo "This script must be run with sudo privileges."
-    exit 1
-fi
-
 ./check_env.sh
 exit_status=$?
 
