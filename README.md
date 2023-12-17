@@ -1,4 +1,4 @@
-# pi-nix zero-2-w native built config
+# pi-nix zero-2-w native built branch
 This branch contains a NixOS configuration specific for the Raspberry Pi Zero 2 W. 
 The flake in this repo contains build targets for an SD card image based on NixOS unstable 
 and linux kernel version 6.6.5. USB host mode is enabled with a patch for the
