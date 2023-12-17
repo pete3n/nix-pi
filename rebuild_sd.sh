@@ -28,6 +28,11 @@ case $exit_status in
         ;;
 esac
 
+IMAGE_NAME="${1:-zero2w-nixos-k6.6.5.img}"
+IMAGE_PATH="./result/sd-image/$IMAGE_NAME"
+MOUNT_DIR="./image"
+OUTPUT_DIR="./output"
+
 # Copy age secrets files to working directory so nix can build them
 echo "Creating /run/zero2w-build-secrets build placeholders..."
 mkdir -p /run/zero2w-build-secrets
