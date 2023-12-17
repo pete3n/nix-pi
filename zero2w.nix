@@ -40,8 +40,11 @@
     };
   };
 
+  # You will want this enabled if you plan to use additional devices that require
+  # redistributable firmware 
+  hardware.enableRedistributableFirmware = lib.mkForce true;
+
   # Keep this to make sure wifi works
-  hardware.enableRedistributableFirmware = lib.mkForce false;
   hardware.firmware = [
     pkgs.raspberrypiWirelessFirmware
   ];
