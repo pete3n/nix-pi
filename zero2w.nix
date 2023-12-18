@@ -141,6 +141,7 @@
       if [ -f /boot/admin ]; then
         mkdir -p /home/admin/.ssh
         mv /boot/admin /home/admin/.ssh/
+        chown -R admin:users /home/admin/.ssh
       fi
     '';
   };
