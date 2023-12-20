@@ -39,7 +39,9 @@ connect to on boot to provide SSH access
 * agenix will use the SSH keys tou encrypt the admin password hash and WiFi information
 so the encrypted age files can be stored in a repo
 * The age files are copied to a directory in /run so that Nix can copy them to the
-nix store for the SD card image
+nix store for the SD card image - NOTE: Nix can reference files from a relative path
+but they must be tracked by Git, otherwise Nix will throw a confusing error saying 
+they can't be found in the Nix store
 * The SD card image is mounted temporarily so that the private SSH keys can be copied
 * The public/private SSH key pairs will be saved to ./private
 * The final SD card image will be saved to ./output
@@ -220,5 +222,5 @@ I couldn't find a good way to read them from the age config path, which is a fil
 The user config has a hashedPasswordFile property which accepts a file as input, so
 I can directly reference the age.secrets path here.
 
-The authorizedKeys.key is add by the build script which copies over the public key
+The authorizedKeys.key is added by the build script which copies over the public key
 from the admin user to here.
