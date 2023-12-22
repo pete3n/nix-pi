@@ -65,9 +65,9 @@ that would otherwise disconnect a remote system
 ```
   outputs = { self, nixpkgs, deploy-rs, agenix, ... }@inputs: 
     let
-      nonFlakePkgs = nixpkgs.legacyPackages.x86_64-linux;
+      flakePkgs = nixpkgs.legacyPackages.x86_64-linux;
     in rec {
-      nixosConfigurations.zero2w = nonFlakePkgs.pkgsCross.aarch64-multiplatform.nixos {
+      nixosConfigurations.zero2w = flakePkgs.pkgsCross.aarch64-multiplatform.nixos {
         imports = [
           "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
           ./zero2w.nix
@@ -78,8 +78,7 @@ that would otherwise disconnect a remote system
 ```
 
 This is the key for cross-compiling. We need to use the pkgsCross package to build our
-configuration for aarch64, however that is found in legacyPackages which don't support
-flakes (to my understanding). aarch64-multiplatform.nixos doesn't utilize modules as
+configuration for aarch64, however aarch64-multiplatform.nixos doesn't provide modules as
 input so we use import for our configuration.
 
 ```

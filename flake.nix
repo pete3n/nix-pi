@@ -9,9 +9,9 @@
 
   outputs = { self, nixpkgs, deploy-rs, agenix, ... }@inputs: 
     let
-      nonFlakePkgs = nixpkgs.legacyPackages.x86_64-linux;
+      flakePkgs = nixpkgs.legacyPackages.x86_64-linux;
     in rec {
-      nixosConfigurations.zero2w = nonFlakePkgs.pkgsCross.aarch64-multiplatform.nixos {
+      nixosConfigurations.zero2w = flakePkgs.pkgsCross.aarch64-multiplatform.nixos {
         imports = [
           "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
           ./zero2w.nix
