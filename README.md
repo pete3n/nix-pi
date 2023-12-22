@@ -16,6 +16,25 @@ x86_64-linux systems not running NixOS.
 Ensure [Flakes are enabled](https://nixos.wiki/wiki/Flakes) for Nix, and that you 
 are running an x86_64-linux based system.
 
+### Install qemu user static binaries
+
+These are needed to emulate some of the tools in the build environment (pkg-config, protoc, protoc-c). 
+On Debian based systems install with:
+```
+sudo apt -y install qemu-user-static
+```
+And then check that aarch64 is being emulated with:
+```
+ls -l /proc/sys/fs/binfmt_misc | grep aarch64
+```
+
+On NixOS add:
+```
+  boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
+```
+To your system config, and rebuild.
+
+
 Clone this branch with:
 ```
 git clone -b zero-2-w-cross https://github.com/pete3n/nix-pi.git
