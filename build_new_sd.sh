@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 #
 
 if [ "$(id -u)" -ne 0 ]; then
@@ -115,7 +115,7 @@ admin_pub_key=$(cat ./private/admin.pub)
 echo
 replacement_ssh="users.users.admin.openssh.authorizedKeys.keys = [ \"$admin_pub_key\" ];"
 sed -i "s|users.users.admin.openssh.authorizedKeys.keys = \[.*\];|$replacement_ssh|" ./zero2w.nix
-sudo -u $SUDO_USER git add ./robo-zero2w-image.nix
+sudo -u $SUDO_USER git add ./zero2w.nix
 echo
 
 echo "Building SD card image..."
