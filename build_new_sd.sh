@@ -119,7 +119,7 @@ sudo -u $SUDO_USER git add ./robo-zero2w-image.nix
 echo
 
 echo "Building SD card image..."
-$NIX --extra-experimental-features "nix-command flakes" build -Lv .#images.zero2w
+sudo -u $SUDO_USER $NIX --extra-experimental-features "nix-command flakes" build -Lv .#images.zero2w
 exit_status=$?
 if [ $exit_status -ne 0 ]; then
     echo "Error detected in build process, exiting..."
