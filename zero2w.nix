@@ -109,9 +109,9 @@
 
   age = {
     secrets = {
-      admin_pass.file = /run/zero2w-build-secrets/admin_pass.age;
-      provision_net_ssid.file = /run/zero2w-build-secrets/provision_net_ssid.age;
-      provision_net_pass.file = /run/zero2w-build-secrets/provision_net_pass.age;
+      admin_pass.file = ./secrets/admin_pass.age;
+      provision_net_ssid.file = ./secrets/provision_net_ssid.age;
+      provision_net_pass.file = ./secrets/provision_net_pass.age;
     };
 
     # SSH keys will be in /boot/ on first boot, and then moved by the activation script
