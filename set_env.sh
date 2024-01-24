@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPTS=(build_new_sd.sh rebuild_sd.sh deploy_config.sh)
+SCRIPTS=(build_new_sd.sh rebuild_sd.sh deploy_system.sh deploy_home.sh)
 
 if [ -x "/run/current-system/sw/bin/nix-shell" ]; then
     SHEBANG_LINE1="#! /usr/bin/env nix-shell"
