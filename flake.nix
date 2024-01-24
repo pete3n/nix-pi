@@ -38,6 +38,7 @@
         modules = [
           ./home-manager/home.nix
         ];
+      };
 
       images.zero2w = nixosConfigurations.zero2w.config.system.build.sdImage; 
 
