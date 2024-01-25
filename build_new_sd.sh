@@ -35,7 +35,7 @@ error_handler() {
         echo "Script halted due to error"
         echo
         echo "Reverting git..."
-        git reset --hard
+        sudo -u $SUDO_USER git reset --hard
         ./restore_env.sh
         exit 1
     fi
