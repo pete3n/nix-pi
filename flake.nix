@@ -11,7 +11,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, deploy-rs, agenix, ... }@inputs: 
+  outputs = { self, nixpkgs, deploy-rs, agenix, home-manager, ... }@inputs: 
     let
       inherit (self) outputs;
       flakePkgs = nixpkgs.legacyPackages.x86_64-linux;
